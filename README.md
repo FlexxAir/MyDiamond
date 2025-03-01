@@ -55,6 +55,7 @@
 ## Building
 #### Requirements
 * Java 21 JDK or newer
+* Git
 #### Compiling from source
 ```sh
 git clone https://github.com/FlexxAir/MyDiamond.git
