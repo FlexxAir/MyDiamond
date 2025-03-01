@@ -1,0 +1,26 @@
+name: MyDiamond
+version: 1.1
+main: org.lsbink.myDiamond.MyDiamond
+api-version: 1.13
+commands:
+  mydiamond:
+    description: Забрать алмазы с баланса
+    usage: /mydiamond
+permissions:
+  mydiamond.see:
+    description: Позволяет смотреть баланс алмазов другого игрока
+    default: op
+  mydiamond.reload:
+    description: Позволяет перезагружать конфиг плагина
+    default: op
+  mydiamond.give:
+    description: Выдает алмазы на баланс
+    default: op
+  mydiamond.take:
+    description: Забирает алмазы из баланса
+    default: op
+  mydiamond:
+    description: Выдает алмазы из баланса
+    default: true
+
+
