@@ -1,5 +1,3 @@
-  **ENG:**
-
 ## Description:
 
 * MyDiamond is a powerful and user-friendly Minecraft (Spigot/Paper) plugin that allows server administrators to manage players' diamond balances. It supports SQLite storage, automatic reminders for available diamonds, and update checks from SpigotMC.
