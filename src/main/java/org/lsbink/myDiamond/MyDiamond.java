@@ -33,18 +33,18 @@ public class MyDiamond extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        loadLanguage();
         loadConfigValues();
         saveDefaultConfig();
-        loadLanguage();
-        checkForUpdates(); // Проверка обновлений должна быть после загрузки языка
+        checkForUpdates();
         getCommand("mydiamond").setTabCompleter(new MyDiamondTabCompleter());
-        getLogger().info("MyDiamond включён!");
+        getLogger().info("MyDiamond Enabled!");
         connectDatabase();
         getCommand("mydiamond").setExecutor(this);
         getServer().getPluginManager().registerEvents(this, this);
         startReminderTask();
     }
-    private static final int RESOURCE_ID = 122920; // Замени на ID своего плагина на SpigotMC
+    private static final int RESOURCE_ID = 122920;
 
     private void checkForUpdates() {
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
@@ -84,7 +84,7 @@ public class MyDiamond extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        getLogger().info("MyDiamond выключен!");
+        getLogger().info("MyDiamond Disabled!");
         disconnectDatabase();
     }
 
@@ -95,7 +95,7 @@ public class MyDiamond extends JavaPlugin implements Listener {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS diamonds (player TEXT PRIMARY KEY, amount INTEGER)");
             statement.close();
         } catch (SQLException e) {
-            getLogger().severe("Ошибка подключения к базе данных: " + e.getMessage());
+            getLogger().severe("Database connection error: " + e.getMessage());
         }
     }
 
@@ -105,7 +105,7 @@ public class MyDiamond extends JavaPlugin implements Listener {
                 connection.close();
             }
         } catch (SQLException e) {
-            getLogger().severe("Ошибка при закрытии соединения с БД: " + e.getMessage());
+            getLogger().severe("Error closing the Database connection: " + e.getMessage());
         }
     }
 
@@ -125,7 +125,7 @@ public class MyDiamond extends JavaPlugin implements Listener {
     }
 
     private String getMessage(String key, String... placeholders) {
-        String message = langConfig.getString("messages." + key, "§c[Ошибка локализации: " + key + "]");
+        String message = langConfig.getString("messages." + key, "§c[Localization error: " + key + "]");
         for (int i = 0; i < placeholders.length; i += 2) {
             message = message.replace(placeholders[i], placeholders[i + 1]);
         }
@@ -140,7 +140,7 @@ public class MyDiamond extends JavaPlugin implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (getDiamonds(player.getName()) > 0) {
-            player.sendMessage(getMessage("reminder"));
+            player.sendMessage(getMessage("messages.reminder"));
         }
     }
 
@@ -151,7 +151,7 @@ public class MyDiamond extends JavaPlugin implements Listener {
                     UUID uuid = player.getUniqueId();
                     long lastTime = lastReminder.getOrDefault(uuid, 0L);
                     if (System.currentTimeMillis() / 1000 - lastTime >= reminderInterval) {
-                        player.sendMessage(getMessage("reminder"));
+                        player.sendMessage(getMessage("messages.reminder"));
                         lastReminder.put(uuid, System.currentTimeMillis() / 1000);
                     }
                 }
@@ -163,79 +163,127 @@ public class MyDiamond extends JavaPlugin implements Listener {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("mydiamond")) {
             if (args.length == 0) {
-                sender.sendMessage(getMessage("command_usage"));
+                if (sender instanceof Player) {
+                    if (!sender.hasPermission("mydiamond")) {
+                        sender.sendMessage(getMessage("messages.no_permission"));
+                        return true;
+                    }
+                    Player player = (Player) sender;
+                    int diamonds = getDiamonds(player.getName());
+                    if (diamonds > 0) {
+                        removeDiamonds(player.getName(), diamonds);
+                        player.getInventory().addItem(new ItemStack(Material.DIAMOND, diamonds));
+                        player.sendMessage(getMessage("collect_success", "%amount%", String.valueOf(diamonds)));
+                    } else {
+                        player.sendMessage(getMessage("messages.no_diamonds"));
+                    }
+                } else {
+                    sender.sendMessage(getMessage("messages.console_player"));
+                }
                 return true;
             }
 
             if (args[0].equalsIgnoreCase("reload")) {
                 if (!sender.hasPermission("mydiamond.reload")) {
-                    sender.sendMessage(getMessage("no_permission"));
+                    sender.sendMessage(getMessage("messages.no_permission"));
                     return true;
                 }
                 reloadConfig();
                 loadLanguage();
-                sender.sendMessage(getMessage("reload_success"));
+                sender.sendMessage(getMessage("messages.reload_success"));
                 return true;
             }
-
-            if (args.length < 2) {
-                sender.sendMessage(getMessage("command_usage"));
-                return true;
-            }
-
-            String targetPlayer = args[1];
 
             if (args[0].equalsIgnoreCase("see")) {
+                if (!sender.hasPermission("mydiamond.see")) {
+                    sender.sendMessage(getMessage("messages.no_permission"));
+                    return true;
+                }
+                if (args.length < 2) {
+                    sender.sendMessage(getMessage("messages.command_usage"));
+                    return true;
+                }
+                String targetPlayer = args[1];
                 int diamonds = getDiamonds(targetPlayer);
                 sender.sendMessage(getMessage("diamonds_balance", "%player%", targetPlayer, "%amount%", String.valueOf(diamonds)));
                 return true;
             }
 
-            if (args.length < 3) {
-                sender.sendMessage(getMessage("command_usage"));
+            if (args[0].equalsIgnoreCase("give") || args[0].equalsIgnoreCase("take")) {
+                if (args[0].equalsIgnoreCase("give") && !sender.hasPermission("mydiamond.give")) {
+                    sender.sendMessage(getMessage("messages.no_permission"));
+                    return true;
+                }
+                if (args[0].equalsIgnoreCase("take") && !sender.hasPermission("mydiamond.take")) {
+                    sender.sendMessage(getMessage("messages.no_permission"));
+                    return true;
+                }
+                if (args.length < 3) {
+                    sender.sendMessage(getMessage("messages.command_usage"));
+                    return true;
+                }
+                String targetPlayer = args[1];
+
+                int amount;
+                try {
+                    amount = Integer.parseInt(args[2]);
+                    if (amount <= 0) {
+                        sender.sendMessage(getMessage("messages.invalid_amount"));
+                        return true;
+                    }
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(getMessage("messages.invalid_number"));
+                    return true;
+                }
+
+                if (args[0].equalsIgnoreCase("give")) {
+                    addDiamonds(targetPlayer, amount);
+                    sender.sendMessage(getMessage("give_success", "%player%", targetPlayer, "%amount%", String.valueOf(amount)));
+                    return true;
+                }
+
+                if (args[0].equalsIgnoreCase("take")) {
+                    removeDiamonds(targetPlayer, amount);
+                    sender.sendMessage(getMessage("take_success", "%player%", targetPlayer, "%amount%", String.valueOf(amount)));
+                    return true;
+                }
+            }
+
+            if (args[0].equalsIgnoreCase("collect")) {
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(getMessage("messages.console_player"));
+                    return true;
+                }
+                if (!sender.hasPermission("mydiamond.collect")) {
+                    sender.sendMessage(getMessage("messages.no_permission"));
+                    return true;
+                }
+                Player player = (Player) sender;
+                int diamonds = getDiamonds(player.getName());
+                if (diamonds > 0) {
+                    removeDiamonds(player.getName(), diamonds);
+                    player.getInventory().addItem(new ItemStack(Material.DIAMOND, diamonds));
+                    player.sendMessage(getMessage("collect_success", "%amount%", String.valueOf(diamonds)));
+                } else {
+                    player.sendMessage(getMessage("messages.no_diamonds"));
+                }
                 return true;
             }
 
-            int amount;
-            try {
-                amount = Integer.parseInt(args[2]);
-                if (amount <= 0) {
-                    sender.sendMessage(getMessage("invalid_amount"));
-                    return true;
-                }
-            } catch (NumberFormatException e) {
-                sender.sendMessage(getMessage("invalid_number"));
-                return true;
-            }
-
-            if (args[0].equalsIgnoreCase("give")) {
-                if (!sender.hasPermission("mydiamond.givediamond")) {
-                    sender.sendMessage(getMessage("no_permission"));
-                    return true;
-                }
-                addDiamonds(targetPlayer, amount);
-                sender.sendMessage(getMessage("give_success", "%player%", targetPlayer, "%amount%", String.valueOf(amount)));
-                return true;
-            }
-
-            if (args[0].equalsIgnoreCase("take")) {
-                if (!sender.hasPermission("mydiamond.removediamonds")) {
-                    sender.sendMessage(getMessage("no_permission"));
-                    return true;
-                }
-                removeDiamonds(targetPlayer, amount);
-                sender.sendMessage(getMessage("take_success", "%player%", targetPlayer, "%amount%", String.valueOf(amount)));
-                return true;
-            }
+            sender.sendMessage(getMessage("messages.command_usage"));
+            return true;
         }
         return false;
     }
+
+
+
 
     private void removeDiamonds(String playerName, int amount) {
         try {
             int currentDiamonds = getDiamonds(playerName);
             if (currentDiamonds < amount) {
-                amount = currentDiamonds; // Удаляем только доступное количество алмазов
+                amount = currentDiamonds;
             }
             PreparedStatement stmt = connection.prepareStatement("UPDATE diamonds SET amount = amount - ? WHERE player = ?");
             stmt.setInt(1, amount);
@@ -243,7 +291,7 @@ public class MyDiamond extends JavaPlugin implements Listener {
             stmt.executeUpdate();
             stmt.close();
         } catch (SQLException e) {
-            getLogger().severe("Ошибка при удалении алмазов: " + e.getMessage());
+            getLogger().severe("Error when removing diamonds: " + e.getMessage());
         }
     }
 
@@ -257,7 +305,7 @@ public class MyDiamond extends JavaPlugin implements Listener {
                 return rs.getInt("amount");
             }
         } catch (SQLException e) {
-            getLogger().severe("Ошибка при получении количества алмазов: " + e.getMessage());
+            getLogger().severe("Error when getting the number of diamonds: " + e.getMessage());
         }
         return 0;
     }
@@ -271,7 +319,7 @@ public class MyDiamond extends JavaPlugin implements Listener {
             stmt.executeUpdate();
             stmt.close();
         } catch (SQLException e) {
-            getLogger().severe("Ошибка при добавлении алмазов: " + e.getMessage());
+            getLogger().severe("Error when adding diamonds: " + e.getMessage());
         }
     }
 }

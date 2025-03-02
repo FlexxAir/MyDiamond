@@ -1,16 +1,22 @@
 messages:
-  no_permission: "§cУ вас нет прав на выполнение этой команды!"
-  reload_success: "§aКонфигурация успешно перезагружена!"
-  diamonds_balance: "§aУ игрока %player% на балансе %amount% алмазов."
-  give_success: "§aИгроку %player% добавлено %amount% алмазов в баланс!"
-  take_success: "§aУ игрока %player% удалено %amount% алмазов из баланса!"
-  invalid_number: "§cНекорректное число!"
-  reminder: "§eУ вас есть алмазы! Используйте /mydiamond, чтобы забрать их."
-  usage: "§cИспользование: %usage%"
-  command_usage: "§cНеизвестная команда! Используйте /mydiamond."
-update:
-  available: "Доступно новое обновление! Текущая версия: %current%, новая версия: %latest%"
-  download: "Скачать можно здесь: https://www.spigotmc.org/resources/%resource_id%"
-  up_to_date: "Вы используете последнюю версию плагина!"
-  error: "Не удалось проверить обновление: %error%"
+  command_usage: "&eИспользование: /mydiamond <see|give|take|reload> [игрок] [количество]"
+  reload_success: "&aКонфигурация и локализация перезагружены!"
+  no_permission: "&cУ вас нет прав на выполнение этой команды!"
+  console_player: "&cЭту команду может использовать только игрок!"
 
+  invalid_amount: "&cВведите корректное число больше 0!"
+  invalid_number: "&cОшибка: укажите правильное число!"
+
+  diamonds_balance: "&aУ игрока %player% %amount% алмазов"
+  give_success: "&aВы выдали %amount% алмазов игроку %player%"
+  take_success: "&aВы забрали %amount% алмазов у игрока %player%"
+
+  reminder: "&eУ вас есть алмазы! Используйте /mydiamond, чтобы проверить баланс!"
+  diamond_received: "&aВы получили алмазы!"
+  no_diamonds: "&cУ вас нет алмазов!"
+  collect_success: "&aВы получили алмазы!"
+update:
+  available: "Доступно обновление! Текущая версия: %current%, новая версия: %latest%"
+  download: "Скачать можно здесь: https://www.spigotmc.org/resources/%resource_id%"
+  up_to_date: "У вас установлена последняя версия!"
+  error: "Ошибка проверки обновлений: %error%"

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class MyDiamondTabCompleter implements TabCompleter {
 
-    private static final List<String> MAIN_COMMANDS = Arrays.asList("give", "take", "see", "reload");
+    private static final List<String> MAIN_COMMANDS = Arrays.asList("give", "take", "collect", "see", "reload");
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
@@ -25,7 +25,7 @@ public class MyDiamondTabCompleter implements TabCompleter {
             return null; // Bukkit автоматически подставит список онлайн-игроков
         } else if (args.length == 3 && (args[0].equalsIgnoreCase("give") || args[0].equalsIgnoreCase("take"))) {
             // Подсказки для количества (amount)
-            completions.add("<Amount>");
+            completions.add("<amount>");
         }
 
         return completions;

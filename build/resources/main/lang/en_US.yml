@@ -1,0 +1,22 @@
+messages:
+  command_usage: "&eIts use: /mydiamond <see|give|take|reload> [player] [quantity]"
+  reload_success: "&aConfiguration and localization have been reloaded!"
+  no_permission: "&cYou do not have the rights to execute this command!"
+  console_player: "&cThis command can only be used by the player!"
+
+  invalid_amount: "&cEnter a valid number greater than 0!"
+  invalid_number: "&cError: enter the correct number!"
+
+  diamonds_balance: "&aPlayer %player% %amount% diamonds"
+  give_success: "&aYou gave %amount% diamonds to player %player%"
+  take_success: "&aYou took %amount% diamonds from player %player%"
+
+  reminder: "&eYou have diamonds! Use /mydiamond to check the balance!"
+  diamond_received: "&aYou got diamonds!"
+  no_diamonds: "&cYou don't have any diamonds!"
+  collect_success: "&aYou got diamonds!"
+update:
+  available: "An update is available! Current version: %current%, new version: %latest%"
+  download: "You can download it here: https://www.spigotmc.org/resources/%resource_id %"
+  up_to_date: "You have the latest version installed!"
+  error: "Update verification error: %error%"
