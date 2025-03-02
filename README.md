@@ -18,7 +18,9 @@
 
 ## Commands & Permissions:
 
-* /mydiamond give <player> <amount> Give diamonds to a player
+* /mydiamond collect OR /mydiamond - Give diamonds to inventory
+
+* /mydiamond give <player> <amount> Give diamonds to a player balance
 
 * /mydiamond take <player> <amount> Remove diamonds from a player
 
