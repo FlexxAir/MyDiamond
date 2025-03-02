@@ -52,7 +52,7 @@
 
 4️⃣ Configure config.yml and reload with /mydiamond reload
 
-Plug-in language change:
+## Plug-in language change:
 
 1️⃣Download [en_US.yml](https://github.com/FlexxAir/MyDiamond/blob/main/src/main/resources/lang/en_US.yml)
 
