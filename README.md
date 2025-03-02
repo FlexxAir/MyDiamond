@@ -52,6 +52,15 @@
 
 4️⃣ Configure config.yml and reload with /mydiamond reload
 
+Plug-in language change:
+
+1️⃣Download [en_US.yml](https://github.com/FlexxAir/MyDiamond/blob/main/src/main/resources/lang/en_US.yml)
+
+2️⃣Copy it to plugins/MyDiamonds/lang/en_US.yml 
+
+3️⃣Change the language in config.yml language: ru_EN to language: en_US
+
+
 ----------------------------------------------------------------------------------------
 
 ## Building
